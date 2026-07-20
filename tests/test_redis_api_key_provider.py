@@ -14,14 +14,14 @@ from typing import Any
 
 import pytest
 from redis.exceptions import ResponseError
-from tai_contract.access_control import OWNER_USER_ID_CLAIM
-from tai_contract.access_control.identity import AuthIdentity
-from tai_contract.access_control.registry import get_identity_provider_factory
-from tai_kit.clients.impl.redis import RedisClient
-from tai_kit.utils.data.string_util import hash_api_key
+from tai42_contract.access_control import OWNER_USER_ID_CLAIM
+from tai42_contract.access_control.identity import AuthIdentity
+from tai42_contract.access_control.registry import get_identity_provider_factory
+from tai42_kit.clients.impl.redis import RedisClient
+from tai42_kit.utils.data.string_util import hash_api_key
 
-from tai_identity_redis import redis_api_key_provider as provider_module
-from tai_identity_redis.redis_api_key_provider import (
+from tai42_identity_redis import redis_api_key_provider as provider_module
+from tai42_identity_redis.redis_api_key_provider import (
     DuplicateIdentityError,
     RedisApiKeyProvider,
 )

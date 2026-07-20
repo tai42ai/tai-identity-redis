@@ -17,17 +17,17 @@ import secrets
 from typing import cast
 
 from redis.exceptions import WatchError
-from tai_contract.access_control import OWNER_USER_ID_CLAIM
-from tai_contract.access_control.identity import (
+from tai42_contract.access_control import OWNER_USER_ID_CLAIM
+from tai42_contract.access_control.identity import (
     ApiKeyIdentityProvider,
     AuthIdentity,
     IdentityProviderSettings,
     ReadinessTarget,
 )
-from tai_contract.access_control.registry import register_identity_provider
-from tai_kit.clients import RedisConnectionSettings, client_ctx
-from tai_kit.clients.impl.redis import RedisClient, hgetall, hset_mapping, scan_iter
-from tai_kit.utils.data.string_util import hash_api_key
+from tai42_contract.access_control.registry import register_identity_provider
+from tai42_kit.clients import RedisConnectionSettings, client_ctx
+from tai42_kit.clients.impl.redis import RedisClient, hgetall, hset_mapping, scan_iter
+from tai42_kit.utils.data.string_util import hash_api_key
 
 logger = logging.getLogger(__name__)
 
@@ -65,8 +65,8 @@ class RedisApiKeyProvider(ApiKeyIdentityProvider):
         return f"{_REVERSE_KEY_PREFIX}{user_id}"
 
     def _redis_settings(self) -> RedisConnectionSettings:
-        # tai-contract types ``settings.redis`` as ``Any`` (it cannot depend on
-        # tai-kit to name ``RedisConnectionSettings``), and kit's ``client_ctx``
+        # tai42-contract types ``settings.redis`` as ``Any`` (it cannot depend on
+        # tai42-kit to name ``RedisConnectionSettings``), and kit's ``client_ctx``
         # takes a NOMINAL settings param, so cast the structural value here — the
         # single spot the plugin bridges the contract Protocol to kit's client.
         return cast("RedisConnectionSettings", self.settings.redis)
@@ -203,7 +203,7 @@ class RedisApiKeyProvider(ApiKeyIdentityProvider):
 
 
 # Module-level registration: the plugin registers itself as "redis" in the
-# contract's direct-import registry at its own import, with no ``tai_app`` handle
+# contract's direct-import registry at its own import, with no ``tai42_app`` handle
 # involved (the handle raises before ``bind()``, and this plugin must register in
 # processes that never ``start()``). The factory is the class itself —
 # ``RedisApiKeyProvider(settings)`` builds a live provider from the settings shape.

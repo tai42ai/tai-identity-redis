@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tai-identity-redis"
+name = "tai42-identity-redis"
 version = "0.1.0"
 description = "Redis-backed api-key identity provider for the TAI ecosystem: an installable plugin that registers itself as the \"redis\" identity provider (token validation plus key provisioning) over plain Redis."
 readme = "README.md"
@@ -26,12 +26,12 @@ dependencies = [
     # The pure interface contract the provider registers through: the identity
     # ABCs (ApiKeyIdentityProvider, IdentityProviderSettings) and the module-level
     # identity-provider registry.
-    "tai-contract>=0.1,<0.2",
+    "tai42-contract>=0.1,<0.2",
     # The Redis client, its hash typing seams (hgetall/hset_mapping/scan_iter),
     # and the api-key hash. The `redis` extra is REQUIRED, not optional: the
-    # provider's storage IS Redis, so tai_kit.clients.impl.redis (which imports the
+    # provider's storage IS Redis, so tai42_kit.clients.impl.redis (which imports the
     # redis driver at module top) must resolve for the plugin to import.
-    "tai-kit[redis]>=0.1,<0.2",
+    "tai42-kit[redis]>=0.1,<0.2",
 ]
 
 [project.urls]
@@ -57,14 +57,21 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["tai_identity_redis*"]
+include = ["tai42_identity_redis*"]
 
 [tool.setuptools.package-data]
-tai_identity_redis = ["py.typed", "tai-plugin.yml"]
+tai42_identity_redis = ["py.typed", "tai-plugin.yml"]
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }]
 
+
+# The version floors in [project] are the compatibility contract; these path
+# sources resolve the sibling checkouts while the packages are unpublished.
+# They are not part of wheel metadata.
+[tool.uv.sources]
+tai42-contract = { path = "../tai-contract", editable = true }
+tai42-kit = { path = "../tai-kit", editable = true }
 [tool.ruff]
 src = ["src"]
 target-version = "py313"
@@ -74,7 +81,7 @@ line-length = 120
 select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "PIE", "PT", "RUF", "TID"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"tai_skeleton".msg = "tai-identity-redis is a contract-facing plugin: it never imports tai-skeleton."
+"tai42_skeleton".msg = "tai42-identity-redis is a contract-facing plugin: it never imports tai42-skeleton."
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -83,7 +90,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
-source = ["tai_identity_redis"]
+source = ["tai42_identity_redis"]
 
 [tool.coverage.report]
 fail_under = 95

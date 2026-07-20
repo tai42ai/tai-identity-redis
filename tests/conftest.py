@@ -161,7 +161,7 @@ class _FakePipeline:
 
 
 def make_client_ctx(fake: FakeRedis):
-    """A drop-in for ``tai_kit.clients.client_ctx`` yielding ``fake`` for any
+    """A drop-in for ``tai42_kit.clients.client_ctx`` yielding ``fake`` for any
     client class, ignoring the settings/pool/fresh arguments."""
 
     @asynccontextmanager
@@ -177,7 +177,7 @@ def _isolate_identity_registry():
     test, so a test that registers (or clears) a provider never leaks into the
     next. The plugin's ``"redis"`` registration (registered at the provider
     module's import) is captured by the baseline snapshot and restored."""
-    from tai_contract.access_control import registry
+    from tai42_contract.access_control import registry
 
     saved = dict(registry._REGISTRY)
     try:

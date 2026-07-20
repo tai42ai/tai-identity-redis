@@ -1,8 +1,8 @@
-# Contributing to tai-identity-redis
+# Contributing to tai42-identity-redis
 
-`tai-identity-redis` is the Redis-backed api-key **identity provider** for the TAI
-ecosystem. The hard rule (the plugin rule): **it depends on `tai-contract` +
-`tai-kit` only and never imports the skeleton.** The provider registers itself as
+`tai42-identity-redis` is the Redis-backed api-key **identity provider** for the TAI
+ecosystem. The hard rule (the plugin rule): **it depends on `tai42-contract` +
+`tai42-kit` only and never imports the skeleton.** The provider registers itself as
 `"redis"` in the contract's module-level identity-provider registry at import —
 there is no import edge to the skeleton in either direction.
 
@@ -11,7 +11,7 @@ there is no import edge to the skeleton in either direction.
 - **No skeleton import — ever.** The package is contract-facing; the ban is
   enforced by ruff (`flake8-tidy-imports`), so a stray import fails lint:
   ```bash
-  grep -rn "tai_skeleton" src/   # must be empty
+  grep -rn "tai42_skeleton" src/   # must be empty
   ```
 - **Loud errors.** No swallowed exceptions, silent fallbacks, or silent
   truncation. A token-validation backend error fails closed by **raising**; an
@@ -20,7 +20,7 @@ there is no import edge to the skeleton in either direction.
 
 ## Layout
 
-- `src/tai_identity_redis/redis_api_key_provider.py` — the `RedisApiKeyProvider`
+- `src/tai42_identity_redis/redis_api_key_provider.py` — the `RedisApiKeyProvider`
   (token validation + provisioning) and its module-level registration.
 - `tests/` — the provider's behavior against an in-memory faked redis seam.
 

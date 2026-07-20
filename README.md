@@ -1,4 +1,4 @@
-# tai-identity-redis
+# tai42-identity-redis
 
 [![CI](https://github.com/tai42ai/tai-identity-redis/actions/workflows/ci.yml/badge.svg)](https://github.com/tai42ai/tai-identity-redis/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -7,14 +7,14 @@ The Redis-backed **api-key identity provider** for the TAI ecosystem — an
 installable plugin that registers itself as the `"redis"` identity provider and
 resolves an inbound api key to an authenticated identity.
 
-Importing the package registers the provider in `tai-contract`'s module-level
+Importing the package registers the provider in `tai42-contract`'s module-level
 identity-provider registry (`register_identity_provider("redis", ...)`), with no
-`tai_app` handle involved — so it registers in any process that imports it,
+`tai42_app` handle involved — so it registers in any process that imports it,
 including ones that never `start()`. A deployment selects it by including
 `redis` in the access-control `auth_providers` list.
 
-Its only tai-* dependencies are `tai-contract` (the identity ABCs and the
-registry it registers through) and `tai-kit` (the Redis client, the hash typing
+Its only tai-* dependencies are `tai42-contract` (the identity ABCs and the
+registry it registers through) and `tai42-kit` (the Redis client, the hash typing
 seams, and the api-key hash). It **never** imports the skeleton — the plugin is
 contract-facing, and the import is banned by ruff.
 
@@ -45,7 +45,7 @@ Key material is never stored — only the SHA-256 hash of the raw key.
 
 ## Surface
 
-The provider implements `tai_contract.access_control.identity.ApiKeyIdentityProvider`:
+The provider implements `tai42_contract.access_control.identity.ApiKeyIdentityProvider`:
 
 | Method | Does |
 |---|---|
@@ -71,7 +71,7 @@ editable dependency of the environment that runs the server:
 ```bash
 git clone https://github.com/tai42ai/tai-identity-redis
 cd tai-skeleton   # or your own app checkout
-uv add --editable ../tai-identity-redis    # once published: uv add tai-identity-redis
+uv add --editable ../tai-identity-redis    # once published: uv add tai42-identity-redis
 ```
 
 ## Development
@@ -84,7 +84,7 @@ uv run pyright
 uv run pytest
 ```
 
-`[tool.uv.sources]` resolves `tai-contract` and `tai-kit` from sibling checkouts
+`[tool.uv.sources]` resolves `tai42-contract` and `tai42-kit` from sibling checkouts
 for local development; the published wheel floors them from the index.
 
 ## License

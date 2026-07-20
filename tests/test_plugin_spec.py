@@ -7,11 +7,11 @@ import tomllib
 from pathlib import Path
 
 import yaml
-from tai_contract.plugins import PluginSpec
+from tai42_contract.plugins import PluginSpec
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _ROOT_SPEC = _REPO_ROOT / "tai-plugin.yml"
-_PACKAGED_SPEC = _REPO_ROOT / "src" / "tai_identity_redis" / "tai-plugin.yml"
+_PACKAGED_SPEC = _REPO_ROOT / "src" / "tai42_identity_redis" / "tai-plugin.yml"
 
 
 def _spec() -> PluginSpec:
@@ -38,7 +38,7 @@ def test_packaged_spec_is_declared_in_package_data():
         "package-data"
     ]
     owning = [key for key, files in package_data.items() if "tai-plugin.yml" in files]
-    assert owning == ["tai_identity_redis"], package_data
+    assert owning == ["tai42_identity_redis"], package_data
 
 
 def test_packaged_copy_is_identical_to_the_root_spec():
