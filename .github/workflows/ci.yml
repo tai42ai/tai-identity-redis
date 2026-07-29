@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tai-identity-redis
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          path: tai-identity-redis
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: ${{ github.repository_owner }}/tai-contract
+          path: tai-contract
+          token: ${{ secrets.TAI_CI_TOKEN }}
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: ${{ github.repository_owner }}/tai-kit
+          path: tai-kit
+          token: ${{ secrets.TAI_CI_TOKEN }}
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          version: "0.11.26"
+          enable-cache: true
+      - run: uv python install 3.13
+      # dev pulls the test/lint/type tooling; --locked asserts the committed
+      # uv.lock is current; --python pins the interpreter.
+      - run: uv sync --locked --python 3.13 --extra dev
+      - name: Ruff
+        run: uv run ruff check .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: Pyright
+        run: uv run pyright
+      - name: Pytest
+        run: uv run pytest --cov --cov-report=term-missing
+      - name: Packaged descriptor
+        # The wheel is what users install, so build it and assert the plugin
+        # descriptor really travels inside it -- at the import path the loader
+        # reads, declaring the same version as the project metadata.
+        run: |
+          set -euo pipefail
+          uv build --wheel --out-dir dist
+          wheel=$(ls dist/*.whl)
+          version=$(uv run --no-sync python -c 'import pathlib, tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')
+          descriptor=$(unzip -p "$wheel" tai42_identity_redis/tai-plugin.yml) || {
+            echo "::error::$wheel does not package tai42_identity_redis/tai-plugin.yml"
+            unzip -l "$wheel"
+            exit 1
+          }
+          printf '%s\n' "$descriptor" | grep -qx "version: $version" || {
+            echo "::error::$wheel packages a tai-plugin.yml that does not declare version: $version"
+            printf '%s\n' "$descriptor"
+            exit 1
+          }
