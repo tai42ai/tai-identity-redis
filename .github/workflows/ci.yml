@@ -67,3 +67,44 @@ jobs:
             printf '%s\n' "$descriptor"
             exit 1
           }
+
+  # Fleet e2e gate. On push:main and on pull_request, after this repo's own
+  # checks pass, dispatch tai-e2e for the tested sha; tai-e2e runs the cross-repo
+  # suite and posts a `fleet-e2e` commit status back, which branch protection
+  # requires. The dispatch token is a repo Actions secret AND a Dependabot secret
+  # so Dependabot PRs dispatch too; a fork PR has neither, so the guarded step
+  # skips and the required status stays unset for a maintainer to run.
+  trigger-e2e:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      E2E_DISPATCH_TOKEN: ${{ secrets.TAI_E2E_DISPATCH_TOKEN }}
+    steps:
+      # Build the payload with jq so the branch name (untrusted) is JSON-escaped,
+      # never interpolated into a shell or into the payload text.
+      - name: Build dispatch payload
+        id: payload
+        if: env.E2E_DISPATCH_TOKEN != ''
+        env:
+          SRC_REPO: tai-identity-redis
+          SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          REF_NAME: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
+          LEGS: ""
+        run: |
+          set -euo pipefail
+          payload="$(jq -nc \
+            --arg repo "$SRC_REPO" \
+            --arg ref "$SHA" \
+            --arg ref_name "$REF_NAME" \
+            --arg legs "$LEGS" \
+            '{repo: $repo, ref: $ref, ref_name: $ref_name} + (if $legs == "" then {} else {legs: $legs} end)')"
+          echo "json=$payload" >> "$GITHUB_OUTPUT"
+      - name: Dispatch fleet-e2e
+        if: env.E2E_DISPATCH_TOKEN != ''
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
+        with:
+          token: ${{ env.E2E_DISPATCH_TOKEN }}
+          repository: ${{ github.repository_owner }}/tai-e2e
+          event-type: fleet-e2e
+          client-payload: ${{ steps.payload.outputs.json }}
