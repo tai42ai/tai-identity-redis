@@ -1247,7 +1247,7 @@ wheels = [
 
 [[package]]
 name = "tai42-identity-redis"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "tai42-contract" },
@@ -1272,7 +1272,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5" },
     { name = "pyyaml", marker = "extra == 'dev'", specifier = ">=6" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "tai42-contract", specifier = ">=0.2,<0.3" },
+    { name = "tai42-contract", specifier = ">=0.2,<0.4" },
     { name = "tai42-kit", extras = ["redis"], specifier = ">=0.2,<0.3" },
 ]
 provides-extras = ["dev"]
